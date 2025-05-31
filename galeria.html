@@ -1,3 +1,4 @@
+<!-- galeria.html -->
 <!DOCTYPE html>
 <html lang="pl">
 <head>
@@ -50,28 +51,19 @@
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container-fluid d-flex align-items-center justify-content-between">
-          <!-- Logo -->
-          <a class="navbar-brand d-flex align-items-center" href="#">
-            <img src="images/logo.png" alt="Logo koła" style="height: 40px; width: auto; margin-right: 10px;">
-            Koło naukowe GameStrategy
-          </a>
-      
-          <!-- Menu -->
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-          </button>
-      
-          <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
-            <ul class="navbar-nav">
-              <li class="nav-item"><a class="nav-link" href="index.html">Strona główna</a></li>
-              <li class="nav-item"><a class="nav-link" href="galeria.html">Galeria</a></li>
-              <li class="nav-item"><a class="nav-link" href="facebook.html">Facebook</a></li>
-            </ul>
-          </div>
-        </div>
-      </nav>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">Koło naukowe GameStrategy</a>
+      <img src="images/logo.png" alt="Logo koła" style="max-width: 150px; margin-top: 10px;">
+      <div class="collapse navbar-collapse">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="index.html">Strona główna</a></li>
+          <li class="nav-item"><a class="nav-link" href="galeria.html">Galeria</a></li>
+          <li class="nav-item"><a class="nav-link" href="facebook.html" onclick="gtag('event', 'click', {event_category: 'Navigation', event_label: 'Facebook'});">Facebook</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
 
   <div class="container mt-5">
     <h2>Galeria eventów</h2>
@@ -88,11 +80,18 @@
     </div>
   </div>
 
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-32K6SE6RWY"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-32K6SE6RWY');
+  </script>
+
   <script>
     const events = {
-      "Event1": [],
-      "Event2": ["wide-zdjecie1.jpg","zdjecie18.jpg","zdjecie3.jpg","zdjecie13.jpg","zdjecie14.jpg"],
-      "Event3": ["wide-zdjecie8.jpg","wide-zdjecie9.jpg","zdjecie10.jpg","zdjecie11.jpg","zdjecie12.jpg"],
+      "event2": ["wide-zdjecie1.jpg","zdjecie18.jpg","zdjecie3.jpg","zdjecie13.jpg","zdjecie14.jpg"],
+      "event3": ["wide-zdjecie8.jpg","wide-zdjecie9.jpg","zdjecie10.jpg","zdjecie11.jpg","zdjecie12.jpg"],
       "Uek Gaming Stage": ["wide-zdjecie18.jpg","wide-zdjecie2.jpg","wide-zdjecie4.jpg","wide-zdjecie7.jpg","zdjecie16.jpg","zdjecie17.jpg"],
       "Inne": ["zdjecie5.jpg","zdjecie6.jpg","zdjecie15.jpg"]
     };
@@ -100,6 +99,7 @@
     const container = document.getElementById("galleryContainer");
 
     for (const [eventName, images] of Object.entries(events)) {
+      const folderName = eventName.toLowerCase().replace(/ /g, '');
       const section = document.createElement('div');
       section.className = "event-section";
       section.innerHTML = `<h3>${eventName}</h3>`;
@@ -110,11 +110,10 @@
       currentRow.classList.add("row");
       let currentWidth = 0;
 
-      images.forEach((img, index) => {
+      images.forEach((img) => {
         const isWide = img.includes("wide");
         const colSize = isWide ? 6 : 4;
 
-        // Nowy rząd jeśli brak miejsca
         if (currentWidth + colSize > 12) {
           if (currentWidth < 12) {
             currentRow.classList.add("justify-content-center");
@@ -129,7 +128,7 @@
         col.className = `col-md-${colSize} mb-4 d-flex justify-content-center`;
 
         const image = document.createElement("img");
-        image.src = `images/${eventName}/${img}`;
+        image.src = `images/${folderName}/${img}`;
         image.alt = `${eventName}`;
         image.className = "gallery-img";
 
@@ -143,7 +142,6 @@
         currentWidth += colSize;
       });
 
-      // Dodaj ostatni rząd
       if (currentRow.children.length > 0) {
         if (currentWidth < 12) {
           currentRow.classList.add("justify-content-center");
