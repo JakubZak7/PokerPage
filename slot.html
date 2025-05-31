@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jednoręki Bandyta</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+      background: #222;
+      color: white;
+    }
+
+    h1 {
+      font-size: 2rem;
+    }
+
+    .machine {
+      background: #444;
+      border: 8px solid #111;
+      border-radius: 20px;
+      padding: 30px 20px;
+      margin: 20px auto;
+      max-width: 400px;
+      box-shadow: 0 0 30px rgba(0,0,0,0.6);
+      position: relative;
+    }
+
+    .slot-container {
+      display: flex;
+      justify-content: center;
+      margin: 20px 0;
+      gap: 15px;
+      background: #111;
+      border: 4px inset #333;
+      border-radius: 12px;
+      padding: 10px;
+    }
+
+    .slot {
+      width: 80px;
+      height: 80px;
+      font-size: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 3px solid #000;
+      border-radius: 10px;
+      background: #fff;
+      color: black;
+      box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+      transition: transform 0.3s;
+    }
+
+    .slot.spin {
+      animation: spin 0.5s ease-in-out;
+    }
+
+    @keyframes spin {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.3); }
+      100% { transform: scale(1); }
+    }
+
+    #spin {
+      padding: 12px 30px;
+      font-size: 18px;
+      cursor: pointer;
+      border: none;
+      background: #e91e63;
+      color: white;
+      border-radius: 8px;
+      margin-top: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+
+    #result {
+      font-size: 1.2rem;
+      margin-top: 15px;
+    }
+
+    .win {
+      color: #76ff03;
+      font-weight: bold;
+    }
+
+    .score {
+      font-size: 1rem;
+      margin-top: 10px;
+    }
+
+    .volume-control {
+      margin-top: 20px;
+    }
+
+    .volume-control label {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    input[type="range"] {
+      width: 200px;
+    }
+
+    @media (max-width: 600px) {
+      .slot-container {
+        gap: 10px;
+      }
+      .slot {
+        width: 60px;
+        height: 60px;
+        font-size: 30px;
+      }
+      #spin {
+        width: 100%;
+        font-size: 16px;
+      }
+      input[type="range"] {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container py-4">
+    <div class="text-start">
+      <a href="index.html" class="btn btn-link">🔙 Powrót do strony głównej</a>
+    </div>
+
+    <h1>LET'S GO GAMBLING 🎰</h1>
+
+    <div class="machine">
+      <div class="slot-container">
+        <div class="slot" id="slot1">🍒</div>
+        <div class="slot" id="slot2">🍋</div>
+        <div class="slot" id="slot3">🍊</div>
+      </div>
+
+      <button id="spin">SPIN</button>
+
+      <p id="result"></p>
+      <p class="score">Punkty: <span id="score">0</span></p>
+
+      <div class="volume-control">
+        <label for="volume">Głośność dźwięków 🎵</label>
+        <input type="range" id="volume" min="0" max="1" step="0.01" value="0.3">
+      </div>
+    </div>
+  </div>
+
+  <audio id="winSound" src="sounds/ka-ching.mp3"></audio>
+  <audio id="loseSound" src="sounds/aw-dangit.mp3"></audio>
+
+  <script>
+    const symbols = ['🍒', '🍋', '🍊', '🍇', '🍉', '7️⃣'];
+    let score = 0;
+    let autoSpin = false;
+    let autoInterval;
+
+    const winSound = document.getElementById('winSound');
+    const loseSound = document.getElementById('loseSound');
+
+    winSound.volume = 0.3;
+    loseSound.volume = 0.3;
+
+    const volumeSlider = document.getElementById('volume');
+    volumeSlider.addEventListener('input', () => {
+      winSound.volume = volumeSlider.value;
+      loseSound.volume = volumeSlider.value;
+    });
+
+    function spinSlot() {
+      const slotElements = [
+        document.getElementById('slot1'),
+        document.getElementById('slot2'),
+        document.getElementById('slot3')
+      ];
+
+      slotElements.forEach(slot => {
+        slot.classList.remove('spin');
+        void slot.offsetWidth;
+        slot.classList.add('spin');
+      });
+
+      const values = slotElements.map(() => symbols[Math.floor(Math.random() * symbols.length)]);
+
+      values.forEach((val, i) => {
+        slotElements[i].textContent = val;
+      });
+
+      const result = document.getElementById('result');
+
+      if (values[0] === values[1] && values[1] === values[2]) {
+        result.textContent = "🎉 Wygrałeś!";
+        result.className = "win";
+        score += 10;
+        winSound.play();
+      } else {
+        result.textContent = "Spróbuj ponownie!";
+        result.className = "";
+        score = Math.max(score - 1, 0);
+        loseSound.play();
+      }
+
+      document.getElementById('score').textContent = score;
+    }
+
+    document.getElementById('spin').addEventListener('click', () => {
+      if (autoSpin) {
+        clearInterval(autoInterval);
+        autoSpin = false;
+        document.getElementById('spin').textContent = 'SPIN';
+      } else {
+        spinSlot();
+      }
+    });
+
+    document.getElementById('spin').addEventListener('mousedown', () => {
+      autoSpin = true;
+      document.getElementById('spin').textContent = 'STOP';
+      autoInterval = setInterval(spinSlot, 3000);
+    });
+
+    document.getElementById('spin').addEventListener('mouseup', () => {
+      if (autoSpin) {
+        clearInterval(autoInterval);
+        autoSpin = false;
+        document.getElementById('spin').textContent = 'SPIN';
+      }
+    });
+  </script>
+
+</body>
+</html>
